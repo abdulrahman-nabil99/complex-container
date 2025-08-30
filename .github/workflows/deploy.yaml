@@ -15,19 +15,19 @@ jobs:
 
       - name: Run client tests
         run: |
-          docker build -t a99nabil/react-test -f ./client/Dockerfile.dev ./client
-          docker run -e CI=true a99nabil/react-test npm test
+          docker build -t a99nabilalqemam/react-test -f ./client/Dockerfile.dev ./client
+          docker run -e CI=true a99nabilalqemam/react-test npm test
 
       - name: Build images
         run: |
-          docker build -t a99nabil/multi-client ./client
-          docker build -t a99nabil/multi-nginx ./nginx
-          docker build -t a99nabil/multi-server ./server
-          docker build -t a99nabil/multi-worker ./worker
+          docker build -t a99nabilalqemam/multi-client ./client
+          docker build -t a99nabilalqemam/multi-nginx ./nginx
+          docker build -t a99nabilalqemam/multi-server ./server
+          docker build -t a99nabilalqemam/multi-worker ./worker
 
       - name: Push images
         run: |
-          docker push a99nabil/multi-client
-          docker push a99nabil/multi-nginx
-          docker push a99nabil/multi-server
-          docker push a99nabil/multi-worker
+          docker push a99nabilalqemam/multi-client
+          docker push a99nabilalqemam/multi-nginx
+          docker push a99nabilalqemam/multi-server
+          docker push a99nabilalqemam/multi-worker
