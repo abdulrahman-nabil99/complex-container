@@ -4,8 +4,13 @@ WORKDIR '/usr/app'
 
 COPY package.json .
 
-RUN npm start build
+RUN npm install
 
 COPY . .
 
-CMD ["npm", "run", "start"]
+RUN npm run build
+
+FROM nginx
+EXPOSE 3000
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /usr/app/build /usr/share/nginx/html
