@@ -1,86 +1,31 @@
-version: '3.9'  # use 3.9 for healthcheck conditions
+version: "3"
 services:
-  postgres:
-    image: "postgres:latest"
-    environment:
-      - POSTGRES_PASSWORD=postgres_password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: "redis:latest"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  express:
-    build: 
-      dockerfile: Dockerfile.dev
-      context: ./server
-    volumes:
-      - /usr/app/node_modules
-      - ./server:/usr/app
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PGUSER=postgres
-      - PGHOST=postgres
-      - PGDATABASE=postgres
-      - PGPASSWORD=postgres_password
-      - PGPORT=5432
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
   client:
-    build: 
-      dockerfile: Dockerfile.dev
-      context: ./client
-    volumes:
-      - /usr/app/node_modules
-      - ./client:/usr/app
+    image: "a99nabilalqemam/multi-client"
+    mem_limit: 128m
+    hostname: client
+  express:
+    image: "a99nabilalqemam/multi-server"
+    mem_limit: 128m
+    hostname: api
     environment:
-      - WDS_SOCKET_PORT=0
-    depends_on:
-      express:
-        condition: service_started
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - PGUSER=$PGUSER
+      - PGHOST=$PGHOST
+      - PGDATABASE=$PGDATABASE
+      - PGPASSWORD=$PGPASSWORD
+      - PGPORT=$PGPORT
   worker:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./worker
-    volumes:
-      - /usr/app/node_modules
-      - ./worker:/usr/app
+    image: "a99nabilalqemam/multi-worker"
+    mem_limit: 128m
+    hostname: worker
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
   nginx:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
-    restart: always
+    image: "a99nabilalqemam/multi-nginx"
+    mem_limit: 128m
+    hostname: nginx
     ports:
-      - 80:80
-    depends_on:
-      client:
-        condition: service_started
-      express:
-        condition: service_started
+      - "80:80"
